@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -43,7 +44,7 @@ fun HomeScreen(
         viewModel.moreLoading
     }
 
-    var loadFirst by rememberSaveable {
+    val loadFirst by rememberSaveable {
         viewModel.firstLoading
     }
 
@@ -163,26 +164,41 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyVerticalGrid(
-                modifier = Modifier.fillMaxSize(),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
 
-                items(itemList.size) { currentItem ->
+                if (loadFirst) {
 
-                    if (currentItem >= itemList.size - 1) {
-                        viewModel.fetchPokemonList()
-                    }
-
-                    PokemonGridItem(
-                        pokemon = itemList[currentItem],
-                        navController = navController
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colors.onSurface,
+                        modifier = Modifier.align(Alignment.Center)
                     )
 
+                } else {
+
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+
+                        items(itemList.size) { currentItem ->
+
+                            if (currentItem >= itemList.size - 1) {
+                                viewModel.fetchPokemonList()
+                            }
+
+                            PokemonGridItem(
+                                pokemon = itemList[currentItem],
+                                navController = navController
+                            )
+
+                        }
+                    }
+
                 }
+
             }
 
         }
