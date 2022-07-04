@@ -40,9 +40,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val loadMore by rememberSaveable {
-        viewModel.moreLoading
-    }
+    val loadMore  = viewModel.moreLoading
 
     val loadFirst by rememberSaveable {
         viewModel.firstLoading

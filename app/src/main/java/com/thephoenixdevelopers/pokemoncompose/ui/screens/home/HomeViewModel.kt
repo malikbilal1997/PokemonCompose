@@ -1,6 +1,8 @@
 package com.thephoenixdevelopers.pokemoncompose.ui.screens.home
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thephoenixdevelopers.pokemoncompose.data.Pokemon
@@ -34,7 +36,7 @@ class HomeViewModel @Inject constructor(
 
     var firstLoading = mutableStateOf(false)
 
-    var moreLoading = mutableStateOf(false)
+    var moreLoading by mutableStateOf(false)
 
     var pokemonList = mutableStateOf(listOf<Pokemon>())
 
@@ -61,7 +63,7 @@ class HomeViewModel @Inject constructor(
                     when (response) {
 
                         is Response.Idle -> {
-                            moreLoading.value = false
+                            moreLoading = false
                             firstLoading.value = false
                         }
 
@@ -71,7 +73,7 @@ class HomeViewModel @Inject constructor(
 
                             callRunning = false
 
-                            moreLoading.value = false
+                            moreLoading = false
 
                             firstLoading.value = false
 
@@ -96,7 +98,7 @@ class HomeViewModel @Inject constructor(
 
                             callRunning = false
 
-                            moreLoading.value = false
+                            moreLoading = false
 
                             firstLoading.value = false
 
@@ -105,7 +107,7 @@ class HomeViewModel @Inject constructor(
 
                         is Response.LoadMore -> {
 
-                            moreLoading.value = true
+                            moreLoading = true
                             firstLoading.value = false
                             errorLoading.value = false
 
@@ -113,7 +115,7 @@ class HomeViewModel @Inject constructor(
 
                         is Response.LoadFirst -> {
 
-                            moreLoading.value = false
+                            moreLoading = false
                             firstLoading.value = true
                             errorLoading.value = false
                         }
