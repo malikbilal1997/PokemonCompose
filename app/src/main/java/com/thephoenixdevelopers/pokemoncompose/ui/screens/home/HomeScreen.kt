@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -26,9 +27,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.thephoenixdevelopers.pokemoncompose.R
 import com.thephoenixdevelopers.pokemoncompose.ui.components.PokemonGridItem
+import com.thephoenixdevelopers.pokemoncompose.ui.components.ProgressCircle
+import com.thephoenixdevelopers.pokemoncompose.ui.components.ProgressRow
 import com.thephoenixdevelopers.pokemoncompose.ui.components.Toolbar
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey100
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey900
+import timber.log.Timber
 
 @Composable
 fun HomeScreen(
@@ -36,16 +40,20 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val itemList by rememberSaveable {
-        viewModel.pokemonList
-    }
-
-    var loadMore by rememberSaveable {
+    val loadMore by rememberSaveable {
         viewModel.moreLoading
     }
 
     val loadFirst by rememberSaveable {
         viewModel.firstLoading
+    }
+
+    val loadError by rememberSaveable {
+        viewModel.errorLoading
+    }
+
+    val loadedList by rememberSaveable {
+        viewModel.pokemonList
     }
 
     var queryState by rememberSaveable {
@@ -61,10 +69,6 @@ fun HomeScreen(
         }
     }
 
-    var nothingFound by rememberSaveable {
-        viewModel.nothingFound
-    }
-
 
     Surface(
         modifier = Modifier
@@ -72,135 +76,188 @@ fun HomeScreen(
             .background(MaterialTheme.colors.surface)
     ) {
 
-        Column {
+        Box(modifier = Modifier.fillMaxSize()) {
 
-            Toolbar(
-                backBtn = false,
-                title = R.string.app_name,
-                navController = navController,
-                bgColor = MaterialTheme.colors.surface,
-                txtColor = MaterialTheme.colors.onSurface,
-                btnColor = MaterialTheme.colors.onSurface
-            )
+            // Showing Progress Bar on Loading of Items First Time
+            if (loadFirst) {
 
-            Spacer(modifier = Modifier.height(8.dp))
+                ProgressCircle(
+                    progressBarSize = 36.dp,
+                    progressBarStroke = 2.dp,
+                    progressBarColor = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
-            Text(
-                lineHeight = 24.sp,
-                text = stringResource(
-                    id = R.string.search_text
-                ),
-                textAlign = TextAlign.Justify,
+            if (loadError) {
 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                Text(
+                    lineHeight = 24.sp,
+                    text = stringResource(
+                        id = R.string.load_error
+                    ),
+                    textAlign = TextAlign.Center,
 
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface,
-            )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .align(Alignment.Center),
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onSurface,
+                )
+            }
 
-            OutlinedTextField(
+            Column(modifier = Modifier.fillMaxSize()) {
 
-                label = null,
-                value = queryState,
-                singleLine = true,
-                placeholder = {
-                    Text(
-                        text = stringResource(
-                            id = R.string.name_or_number
-                        ),
-                        style = MaterialTheme.typography.body2,
-                        color = MaterialTheme.colors.onSurface
+                Toolbar(
+                    backBtn = false,
+                    title = R.string.app_name,
+                    navController = navController,
+                    bgColor = MaterialTheme.colors.surface,
+                    txtColor = MaterialTheme.colors.onSurface,
+                    btnColor = MaterialTheme.colors.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    lineHeight = 24.sp,
+                    text = stringResource(
+                        id = R.string.search_text
+                    ),
+                    textAlign = TextAlign.Justify,
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onSurface,
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Search Box for Searching Pokemon from the List
+                OutlinedTextField(
+
+                    label = null,
+                    value = queryState,
+                    singleLine = true,
+                    placeholder = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.name_or_number
+                            ),
+                            style = MaterialTheme.typography.body2,
+                            color = MaterialTheme.colors.onSurface
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colors.onSurface
+                        )
+                    },
+                    trailingIcon = {
+
+                        if (queryState.isNotEmpty()) {
+
+                            IconButton(
+                                onClick = {
+                                    queryState = String()
+                                },
+
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Close,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                        tint = MaterialTheme.colors.onSurface
+                                    )
+                                }
+                            )
+                        }
+                    },
+                    onValueChange = {
+                        queryState = it
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    textStyle = MaterialTheme.typography.body2,
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(searchBoxBackgroundColor),
+
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = MaterialTheme.colors.onSurface
                     )
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colors.onSurface
-                    )
-                },
-                trailingIcon = {
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                // Lazy Vertical Grid for Showing Pokemon List
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
 
                     if (queryState.isNotEmpty()) {
 
-                        IconButton(
-                            onClick = {
-                                queryState = String()
-                            },
+                        val copyList = loadedList.map { it.copy() }
 
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Rounded.Close,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colors.onSurface
-                                )
-                            }
-                        )
-                    }
-                },
-                onValueChange = {
-                    queryState = it
-                },
-                shape = RoundedCornerShape(12.dp),
-                textStyle = MaterialTheme.typography.body2,
+                        val searchList = copyList.filter { pokemon ->
+                            pokemon.name.lowercase().contains(queryState)
+                        }
 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(searchBoxBackgroundColor),
+                        items(searchList.size) { currentItem ->
 
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = MaterialTheme.colors.onSurface
-                )
-            )
+                            PokemonGridItem(
+                                pokemon = searchList[currentItem],
+                                navController = navController
+                            )
+                        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    } else {
 
-            Box(modifier = Modifier.fillMaxSize()) {
+                        items(loadedList.size) { currentItem ->
 
-                if (loadFirst) {
-
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colors.onSurface,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-
-                } else {
-
-                    LazyVerticalGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-
-                        items(itemList.size) { currentItem ->
-
-                            if (currentItem >= itemList.size - 1) {
+                            // Fetching More Items if Reached End of The List
+                            if (currentItem >= loadedList.size - 1) {
                                 viewModel.fetchPokemonList()
                             }
 
                             PokemonGridItem(
-                                pokemon = itemList[currentItem],
+                                pokemon = loadedList[currentItem],
                                 navController = navController
                             )
-
                         }
                     }
 
+                    // Showing Load More Progress Bar on Fetching More Items.
+                    if (loadMore) {
+
+                        item(span = { GridItemSpan(2) }) {
+
+                            ProgressRow(
+                                progressBarSize = 36.dp,
+                                progressBarStroke = 2.dp,
+                                progressRowHeight = 48.dp,
+                                progressBarColor = MaterialTheme.colors.onSurface,
+                            )
+                        }
+                    }
                 }
-
             }
-
         }
     }
 }

@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
     // For Checking if More Records Available on Server.
     private var canFetchMore = false
 
-    var nothingFound = mutableStateOf(false)
+    var errorLoading = mutableStateOf(false)
 
     var firstLoading = mutableStateOf(false)
 
@@ -75,15 +75,11 @@ class HomeViewModel @Inject constructor(
 
                             firstLoading.value = false
 
-                            nothingFound.value = pokemonList.value.isEmpty()
+                            errorLoading.value = pokemonList.value.isEmpty()
 
                         }
 
                         is Response.Success -> {
-
-                            Timber.d("Success -> Get Pokemon List Completed")
-
-                            Timber.d("Pokemon List Size -> %s", response.success.size)
 
                             val combineList = mutableListOf<Pokemon>()
 
@@ -104,14 +100,14 @@ class HomeViewModel @Inject constructor(
 
                             firstLoading.value = false
 
-                            nothingFound.value = pokemonList.value.isEmpty()
+                            errorLoading.value = pokemonList.value.isEmpty()
                         }
 
                         is Response.LoadMore -> {
 
                             moreLoading.value = true
                             firstLoading.value = false
-                            nothingFound.value = false
+                            errorLoading.value = false
 
                         }
 
@@ -119,7 +115,7 @@ class HomeViewModel @Inject constructor(
 
                             moreLoading.value = false
                             firstLoading.value = true
-                            nothingFound.value = false
+                            errorLoading.value = false
                         }
                     }
                 }
