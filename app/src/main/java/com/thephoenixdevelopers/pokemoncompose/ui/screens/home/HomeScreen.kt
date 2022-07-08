@@ -32,7 +32,6 @@ import com.thephoenixdevelopers.pokemoncompose.ui.components.ProgressRow
 import com.thephoenixdevelopers.pokemoncompose.ui.components.Toolbar
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey100
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey900
-import timber.log.Timber
 
 @Composable
 fun HomeScreen(
@@ -41,6 +40,10 @@ fun HomeScreen(
 ) {
 
     val loadMore  = viewModel.moreLoading
+
+    val loadLast by rememberSaveable {
+        viewModel.lastLoading
+    }
 
     val loadFirst by rememberSaveable {
         viewModel.firstLoading
@@ -119,23 +122,6 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    lineHeight = 24.sp,
-                    text = stringResource(
-                        id = R.string.search_text
-                    ),
-                    textAlign = TextAlign.Justify,
-
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface,
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 // Search Box for Searching Pokemon from the List
                 OutlinedTextField(
 
@@ -145,7 +131,7 @@ fun HomeScreen(
                     placeholder = {
                         Text(
                             text = stringResource(
-                                id = R.string.name_or_number
+                                id = R.string.search
                             ),
                             style = MaterialTheme.typography.body2,
                             color = MaterialTheme.colors.onSurface
@@ -230,7 +216,7 @@ fun HomeScreen(
                         items(loadedList.size) { currentItem ->
 
                             // Fetching More Items if Reached End of The List
-                            if (currentItem >= loadedList.size - 1) {
+                            if (currentItem >= loadedList.size - 1 && !loadLast && !loadFirst && !loadMore) {
                                 viewModel.fetchPokemonList()
                             }
 

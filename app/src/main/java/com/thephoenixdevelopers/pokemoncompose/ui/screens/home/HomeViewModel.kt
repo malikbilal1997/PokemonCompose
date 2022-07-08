@@ -1,8 +1,6 @@
 package com.thephoenixdevelopers.pokemoncompose.ui.screens.home
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thephoenixdevelopers.pokemoncompose.data.Pokemon
@@ -26,17 +24,13 @@ class HomeViewModel @Inject constructor(
 
     private var offset = 0
 
-    // For Checking if the Network Call Running Already.
-    private var callRunning = false
-
-    // For Checking if More Records Available on Server.
-    private var canFetchMore = false
+    var lastLoading = mutableStateOf(false)
 
     var errorLoading = mutableStateOf(false)
 
     var firstLoading = mutableStateOf(false)
 
-    var moreLoading by mutableStateOf(false)
+    var moreLoading = mutableStateOf(false)
 
     var pokemonList = mutableStateOf(listOf<Pokemon>())
 
@@ -47,82 +41,71 @@ class HomeViewModel @Inject constructor(
 
     fun fetchPokemonList() {
 
-        if (!callRunning && !canFetchMore) {
+        viewModelScope.launch {
 
-            // Setting Network Call Flag to True When Request Start.
-            callRunning = true
+            pokemonRepo.getPokemonList(
 
-            viewModelScope.launch {
+                limit, offset
 
-                pokemonRepo.getPokemonList(
+            ).collect { response ->
 
-                    limit, offset
+                when (response) {
 
-                ).collect { response ->
+                    is Response.Idle -> {
+                        moreLoading.value = false
+                        firstLoading.value = false
+                    }
 
-                    when (response) {
+                    is Response.Error -> {
 
-                        is Response.Idle -> {
-                            moreLoading = false
-                            firstLoading.value = false
-                        }
+                        Timber.d("Error -> %s", response.error)
 
-                        is Response.Error -> {
+                        moreLoading.value = false
 
-                            Timber.d("Error -> %s", response.error)
+                        firstLoading.value = false
 
-                            callRunning = false
+                        errorLoading.value = pokemonList.value.isEmpty()
 
-                            moreLoading = false
+                    }
 
-                            firstLoading.value = false
+                    is Response.Success -> {
 
-                            errorLoading.value = pokemonList.value.isEmpty()
+                        val combineList = mutableListOf<Pokemon>()
 
-                        }
+                        combineList.addAll(pokemonList.value)
 
-                        is Response.Success -> {
+                        combineList.addAll(response.success)
 
-                            val combineList = mutableListOf<Pokemon>()
+                        lastLoading.value = response.success.size < limit
 
-                            combineList.addAll(pokemonList.value)
+                        // Assigning the Combine Pokemon List to Mutable State.
+                        pokemonList.value = combineList
 
-                            combineList.addAll(response.success)
+                        offset += limit
 
-                            canFetchMore = response.success.size < limit
+                        moreLoading.value = false
 
-                            // Assigning the Combine Pokemon List to Mutable State.
-                            pokemonList.value = combineList
+                        firstLoading.value = false
 
-                            offset += limit
+                        errorLoading.value = pokemonList.value.isEmpty()
+                    }
 
-                            callRunning = false
+                    is Response.LoadMore -> {
 
-                            moreLoading = false
+                        moreLoading.value = true
+                        firstLoading.value = false
+                        errorLoading.value = false
 
-                            firstLoading.value = false
+                    }
 
-                            errorLoading.value = pokemonList.value.isEmpty()
-                        }
+                    is Response.LoadFirst -> {
 
-                        is Response.LoadMore -> {
-
-                            moreLoading = true
-                            firstLoading.value = false
-                            errorLoading.value = false
-
-                        }
-
-                        is Response.LoadFirst -> {
-
-                            moreLoading = false
-                            firstLoading.value = true
-                            errorLoading.value = false
-                        }
+                        moreLoading.value = false
+                        firstLoading.value = true
+                        errorLoading.value = false
                     }
                 }
             }
-
         }
 
     }

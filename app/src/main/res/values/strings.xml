@@ -2,10 +2,8 @@
 
     <string name="app_name">Pokédex</string>
 
-    <string name="name_or_number">Name or number</string>
+    <string name="search">Search…</string>
 
     <string name="load_error">Something went wrong. Please try again.</string>
-    
-    <string name="search_text">Search for a pokémon by name or using its national pokédex number.</string>
 
 </resources>
