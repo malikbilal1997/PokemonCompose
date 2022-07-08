@@ -216,7 +216,9 @@ fun HomeScreen(
                         items(loadedList.size) { currentItem ->
 
                             // Fetching More Items if Reached End of The List
-                            if (currentItem >= loadedList.size - 1 && !loadLast && !loadFirst && !loadMore) {
+                            if (currentItem >= loadedList.size - 1 &&
+                                !loadLast && !loadFirst && !loadMore
+                            ) {
                                 viewModel.fetchPokemonList()
                             }
 
