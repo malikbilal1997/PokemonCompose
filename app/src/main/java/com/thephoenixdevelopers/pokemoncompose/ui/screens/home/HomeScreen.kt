@@ -39,37 +39,17 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val loadMore  = viewModel.moreLoading
+    val loadMore by rememberSaveable { viewModel.moreLoading }
 
-    val loadLast by rememberSaveable {
-        viewModel.lastLoading
-    }
+    val loadLast by rememberSaveable { viewModel.lastLoading }
 
-    val loadFirst by rememberSaveable {
-        viewModel.firstLoading
-    }
+    val loadFirst by rememberSaveable { viewModel.firstLoading }
 
-    val loadError by rememberSaveable {
-        viewModel.errorLoading
-    }
+    val loadError by rememberSaveable { viewModel.errorLoading }
 
-    val loadedList by rememberSaveable {
-        viewModel.pokemonList
-    }
+    val loadedList by rememberSaveable { viewModel.pokemonList }
 
-    var queryState by rememberSaveable {
-        mutableStateOf(String())
-    }
-
-    val searchBoxBackgroundColor = when {
-        isSystemInDarkTheme() -> {
-            Grey900
-        }
-        else -> {
-            Grey100
-        }
-    }
-
+    var queryState by rememberSaveable { mutableStateOf(String()) }
 
     Surface(
         modifier = Modifier
@@ -176,7 +156,16 @@ fun HomeScreen(
                         .height(48.dp)
                         .padding(horizontal = 16.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(searchBoxBackgroundColor),
+                        .background(
+                            when {
+                                isSystemInDarkTheme() -> {
+                                    Grey900
+                                }
+                                else -> {
+                                    Grey100
+                                }
+                            }
+                        ),
 
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = MaterialTheme.colors.onSurface
