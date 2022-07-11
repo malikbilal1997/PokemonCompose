@@ -30,20 +30,21 @@ fun PokemonGridItem(
     pokemon: Pokemon = Pokemon(),
     navController: NavController
 ) {
-    val pokemonBoxBackgroundColor = when {
-        isSystemInDarkTheme() -> {
-            Grey900
-        }
-        else -> {
-            Grey100
-        }
-    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(pokemonBoxBackgroundColor)
+            .background(
+                when {
+                    isSystemInDarkTheme() -> {
+                        Grey900
+                    }
+                    else -> {
+                        Grey100
+                    }
+                }
+            )
             .clickable {
                 navController.navigate(
                     "${Screen.Detail.route}/${pokemon.name}"
