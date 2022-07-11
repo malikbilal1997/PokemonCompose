@@ -93,7 +93,10 @@ fun HomeScreen(
 
                 Toolbar(
                     backBtn = false,
-                    title = R.string.app_name,
+                    titleCenter = false,
+                    title = stringResource(
+                        id = R.string.app_name
+                    ),
                     navController = navController,
                     bgColor = MaterialTheme.colors.surface,
                     txtColor = MaterialTheme.colors.onSurface,

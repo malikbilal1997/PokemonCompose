@@ -2,6 +2,7 @@ package com.thephoenixdevelopers.pokemoncompose.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,20 +29,23 @@ fun Navigation(
         }
 
         composable(
-            route = "${Screen.Detail.route}/{name}",
+            route = "${Screen.Detail.route}/{pokemonName}",
             arguments = listOf(
-                navArgument("name") {
+                navArgument("pokemonName") {
                     type = NavType.StringType
                 }
             )
 
         ) {
 
-            val name = remember {
-                it.arguments?.getString("name")
+            val pokemonName = rememberSaveable {
+                it.arguments?.getString("pokemonName") ?: String()
             }
 
-            DetailScreen(navController = navController)
+            DetailScreen(
+                pokemonName = pokemonName,
+                navController = navController
+            )
         }
 
         composable(Screen.Splash.route) {
