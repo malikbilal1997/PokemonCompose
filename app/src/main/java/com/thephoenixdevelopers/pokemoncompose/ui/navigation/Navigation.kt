@@ -29,20 +29,28 @@ fun Navigation(
         }
 
         composable(
-            route = "${Screen.Detail.route}/{pokemonName}",
+            route = "${Screen.Detail.route}/{pokemonUrl}/{pokemonName}",
             arguments = listOf(
+                navArgument("pokemonUrl") {
+                    type = NavType.StringType
+                },
                 navArgument("pokemonName") {
                     type = NavType.StringType
-                }
+                },
             )
 
         ) {
+
+            val pokemonUrl = rememberSaveable {
+                it.arguments?.getString("pokemonUrl") ?: String()
+            }
 
             val pokemonName = rememberSaveable {
                 it.arguments?.getString("pokemonName") ?: String()
             }
 
             DetailScreen(
+                pokemonUrl = pokemonUrl,
                 pokemonName = pokemonName,
                 navController = navController
             )

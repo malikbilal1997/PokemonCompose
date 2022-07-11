@@ -23,6 +23,9 @@ import com.thephoenixdevelopers.pokemoncompose.ui.navigation.Screen
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey100
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey900
 import com.thephoenixdevelopers.pokemoncompose.utils.PokemonImageUtil.getImageUrl
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+import java.nio.charset.StandardCharsets.UTF_8
 
 
 @Composable
@@ -46,8 +49,15 @@ fun PokemonGridItem(
                 }
             )
             .clickable {
+
+                val encodedUrl = URLEncoder.encode(
+                    pokemon.url, UTF_8.toString()
+                )
+
+                val parameters = "${encodedUrl}/${pokemon.name}"
+
                 navController.navigate(
-                    "${Screen.Detail.route}/${pokemon.name}"
+                    "${Screen.Detail.route}/$parameters"
                 )
             },
         contentAlignment = Alignment.Center,

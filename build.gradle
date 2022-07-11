@@ -8,10 +8,10 @@ buildscript {
         hilt_navigation = '1.0.0'
         retrofit_version = '2.9.0'
         activity_version = '1.4.0'
-        lifecycle_version = '2.4.1'
+        lifecycle_version = '2.5.0'
         constraint_version = '1.0.1'
-        navigation_version = '2.4.2'
-        compose_version = '1.2.0-rc02'
+        navigation_version = '2.5.0'
+        compose_version = '1.2.0-rc03'
         hilt_viewmodel = '1.0.0-alpha03'
     }
 
