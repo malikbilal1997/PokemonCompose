@@ -1,34 +1,31 @@
 package com.thephoenixdevelopers.pokemoncompose.ui.components
 
-import android.content.res.Configuration
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.thephoenixdevelopers.pokemoncompose.ui.theme.PokedexTheme
 
 @Composable
 fun ProgressCircle(
     modifier: Modifier = Modifier,
     progressBarSize: Dp = 48.dp,
     progressBarStroke: Dp = 4.dp,
-    progressBarColor: Color = MaterialTheme.colors.primary
+    progressBarColor: Color = MaterialTheme.colors.primary,
 ) {
-
-    CircularProgressIndicator(
+    CircularProgressBar(
+        modifier = modifier,
         color = progressBarColor,
-        strokeWidth = progressBarStroke,
-        modifier = modifier
-            .size(progressBarSize)
+        progressSize = progressBarSize,
+        strokeSize = progressBarStroke,
     )
 }
 
@@ -38,43 +35,91 @@ fun ProgressRow(
     progressRowHeight: Dp = 56.dp,
     progressBarSize: Dp = 48.dp,
     progressBarStroke: Dp = 4.dp,
-    progressBarColor: Color = MaterialTheme.colors.primary
+    progressBarColor: Color = MaterialTheme.colors.primary,
 ) {
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(progressRowHeight)
+            .height(progressRowHeight),
     ) {
 
-        CircularProgressIndicator(
+        CircularProgressBar(
             color = progressBarColor,
-            strokeWidth = progressBarStroke,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(progressBarSize)
+            progressSize = progressBarSize,
+            strokeSize = progressBarStroke,
+            modifier = modifier
+                .align(Alignment.Center),
         )
     }
 
 }
 
-
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
 @Composable
-fun ProgressCirclePreview() {
+fun ImageProgress(
+    modifier: Modifier = Modifier,
+    progressBarSize: Dp = 48.dp,
+    progressBarStroke: Dp = 4.dp,
+    progressBarColor: Color = MaterialTheme.colors.primary,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
 
-    PokedexTheme {
-        ProgressCircle()
+        CircularProgressBar(
+            color = progressBarColor,
+            progressSize = progressBarSize,
+            strokeSize = progressBarStroke,
+            modifier = modifier
+                .align(Alignment.Center),
+        )
     }
+
 }
 
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
 @Composable
-fun ProgressRowPreview() {
+fun CircularProgressBar(
+    modifier: Modifier = Modifier,
+    strokeSize: Dp = 4.dp,
+    progressSize: Dp = 48.dp,
+    animationDuration: Int = 800,
+    rightRotation: Boolean = true,
+    strokeCap: StrokeCap = StrokeCap.Round,
+    color: Color = MaterialTheme.colors.primary,
+) {
 
-    PokedexTheme {
-        ProgressRow()
+    val transition = rememberInfiniteTransition()
+
+    val angle by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = when {
+            rightRotation -> 360f
+            else -> -360f
+        },
+        animationSpec = infiniteRepeatable(
+            tween(
+                easing = LinearEasing,
+                durationMillis = animationDuration,
+            )
+        )
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        Canvas(modifier = modifier.size(progressSize)) {
+            drawArc(
+                color = color,
+                startAngle = angle,
+                sweepAngle = 270f,
+                useCenter = false,
+                style = Stroke(
+                    strokeSize.toPx(),
+                    cap = strokeCap,
+                ),
+            )
+        }
     }
 }

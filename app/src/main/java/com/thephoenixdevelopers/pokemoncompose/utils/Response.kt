@@ -4,9 +4,7 @@ sealed class Response<out T> {
 
     object Idle : Response<Nothing>()
 
-    object LoadMore : Response<Nothing>()
-
-    object LoadFirst : Response<Nothing>()
+    object Loading : Response<Nothing>()
 
     data class Success<T>(val success: T) : Response<T>()
 

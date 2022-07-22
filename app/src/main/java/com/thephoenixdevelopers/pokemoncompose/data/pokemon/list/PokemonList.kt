@@ -1,8 +1,7 @@
-package com.thephoenixdevelopers.pokemoncompose.data
+package com.thephoenixdevelopers.pokemoncompose.data.pokemon.list
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.thephoenixdevelopers.pokemoncompose.data.Pokemon
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

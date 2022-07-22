@@ -26,17 +26,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.thephoenixdevelopers.pokemoncompose.R
-import com.thephoenixdevelopers.pokemoncompose.ui.components.PokemonGridItem
-import com.thephoenixdevelopers.pokemoncompose.ui.components.ProgressCircle
-import com.thephoenixdevelopers.pokemoncompose.ui.components.ProgressRow
-import com.thephoenixdevelopers.pokemoncompose.ui.components.Toolbar
+import com.thephoenixdevelopers.pokemoncompose.ui.components.*
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey100
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey900
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
 
     val loadMore by rememberSaveable { viewModel.moreLoading }
@@ -207,11 +204,13 @@ fun HomeScreen(
 
                         items(loadedList.size) { currentItem ->
 
-                            // Fetching More Items if Reached End of The List
-                            if ((currentItem >= loadedList.size - 1) &&
-                                !loadLast && !loadFirst && !loadMore
-                            ) {
-                                viewModel.fetchPokemonList()
+                            // Fetching More Items if Reached End of The List.
+                            if (currentItem >= loadedList.size - 1) {
+
+                                // Fetching Only If It's not Loading & Last Item.
+                                if (!loadLast && !loadFirst && !loadMore) {
+                                    viewModel.fetchPokemonList()
+                                }
                             }
 
                             PokemonGridItem(

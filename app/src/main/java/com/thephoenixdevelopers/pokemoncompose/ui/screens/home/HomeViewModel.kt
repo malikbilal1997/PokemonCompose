@@ -3,9 +3,9 @@ package com.thephoenixdevelopers.pokemoncompose.ui.screens.home
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.thephoenixdevelopers.pokemoncompose.data.Pokemon
+import com.thephoenixdevelopers.pokemoncompose.data.pokemon.list.Pokemon
 import com.thephoenixdevelopers.pokemoncompose.repos.PokemonRepo
-import com.thephoenixdevelopers.pokemoncompose.utils.Response
+import com.thephoenixdevelopers.pokemoncompose.utils.PageResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 
@@ -51,12 +51,12 @@ class HomeViewModel @Inject constructor(
 
                 when (response) {
 
-                    is Response.Idle -> {
+                    is PageResponse.Idle -> {
                         moreLoading.value = false
                         firstLoading.value = false
                     }
 
-                    is Response.Error -> {
+                    is PageResponse.Error -> {
 
                         Timber.d("Error -> %s", response.error)
 
@@ -68,7 +68,7 @@ class HomeViewModel @Inject constructor(
 
                     }
 
-                    is Response.Success -> {
+                    is PageResponse.Success -> {
 
                         val combineList = mutableListOf<Pokemon>()
 
@@ -90,7 +90,7 @@ class HomeViewModel @Inject constructor(
                         errorLoading.value = pokemonList.value.isEmpty()
                     }
 
-                    is Response.LoadMore -> {
+                    is PageResponse.LoadMore -> {
 
                         moreLoading.value = true
                         firstLoading.value = false
@@ -98,7 +98,7 @@ class HomeViewModel @Inject constructor(
 
                     }
 
-                    is Response.LoadFirst -> {
+                    is PageResponse.LoadFirst -> {
 
                         moreLoading.value = false
                         firstLoading.value = true

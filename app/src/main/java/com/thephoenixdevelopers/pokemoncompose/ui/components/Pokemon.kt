@@ -1,6 +1,5 @@
 package com.thephoenixdevelopers.pokemoncompose.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,23 +14,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.thephoenixdevelopers.pokemoncompose.data.Pokemon
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import com.thephoenixdevelopers.pokemoncompose.data.pokemon.list.Pokemon
 import com.thephoenixdevelopers.pokemoncompose.ui.navigation.Screen
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey100
 import com.thephoenixdevelopers.pokemoncompose.ui.theme.Grey900
-import com.thephoenixdevelopers.pokemoncompose.utils.PokemonImageUtil.getImageUrl
+import com.thephoenixdevelopers.pokemoncompose.utils.PokemonImageUtil.getDefaultImageUrl
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.nio.charset.StandardCharsets.UTF_8
 
 
 @Composable
 fun PokemonGridItem(
     pokemon: Pokemon = Pokemon(),
-    navController: NavController
+    navController: NavController,
 ) {
 
     Box(
@@ -69,13 +70,31 @@ fun PokemonGridItem(
                 .padding(24.dp)
         ) {
 
-            Image(
+            SubcomposeAsyncImage(
                 contentDescription = null,
-                painter = rememberAsyncImagePainter(
-                    model = getImageUrl(pokemon.url)
-                ),
+                model = getDefaultImageUrl(pokemon.url),
                 modifier = Modifier.aspectRatio(1f)
-            )
+            ) {
+
+                when (painter.state) {
+
+                    is AsyncImagePainter.State.Success -> {
+                        SubcomposeAsyncImageContent()
+                    }
+
+                    is AsyncImagePainter.State.Loading -> {
+                        ImageProgress(
+                            progressBarSize = 24.dp,
+                            progressBarStroke = 2.dp,
+                            progressBarColor = MaterialTheme.colors.onSurface,
+                            modifier = Modifier
+                        )
+                    }
+
+                    else -> Unit
+                }
+
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -94,6 +113,62 @@ fun PokemonGridItem(
                 color = MaterialTheme.colors.onSurface,
             )
         }
+    }
+
+}
+
+@Composable
+fun PokemonSpriteItem(
+    spriteBoxSize: Dp = 120.dp,
+    spriteImgSize: Dp = 64.dp,
+    imageUrl: String = String(),
+) {
+
+    Box(
+        modifier = Modifier
+            .size(spriteBoxSize)
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                when {
+                    isSystemInDarkTheme() -> {
+                        Grey900
+                    }
+                    else -> {
+                        Grey100
+                    }
+                }
+            ),
+
+        contentAlignment = Alignment.Center,
+    ) {
+
+        SubcomposeAsyncImage(
+            contentDescription = null,
+            model = imageUrl,
+            modifier = Modifier
+                .size(spriteImgSize)
+        ) {
+
+            when (painter.state) {
+
+                is AsyncImagePainter.State.Success -> {
+                    SubcomposeAsyncImageContent()
+                }
+
+                is AsyncImagePainter.State.Loading -> {
+                    ImageProgress(
+                        modifier = Modifier,
+                        progressBarSize = 24.dp,
+                        progressBarStroke = 2.dp,
+                        progressBarColor = MaterialTheme.colors.onSurface,
+                    )
+                }
+
+                else -> Unit
+            }
+
+        }
+
     }
 
 }
